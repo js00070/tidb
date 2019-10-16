@@ -517,9 +517,39 @@ func (b *builtinArithmeticPlusDecimalSig) vecEvalDecimal(input *chunk.Chunk, res
 }
 
 func (b *builtinArithmeticMultiplyIntUnsignedSig) vectorized() bool {
-	return false
+	return true
 }
 
 func (b *builtinArithmeticMultiplyIntUnsignedSig) vecEvalInt(input *chunk.Chunk, result *chunk.Column) error {
-	return errors.Errorf("not implemented")
+	n := input.NumRows()
+	if err := b.args[0].VecEvalInt(b.ctx, input, result); err != nil {
+		return err
+	}
+
+	buf, err := b.bufAllocator.get(types.ETInt, n)
+	if err != nil {
+		return err
+	}
+	defer b.bufAllocator.put(buf)
+
+	if err := b.args[1].VecEvalInt(b.ctx, input, buf); err != nil {
+		return nil
+	}
+
+	result.MergeNulls(buf)
+	var tmp uint64
+	x := result.Int64s()
+	y := buf.Int64s()
+	for i := 0; i < n; i++ {
+		if result.IsNull(i) {
+			continue
+		}
+		tmp = uint64(x[i]) * uint64(y[i])
+		if x[i] != 0 && tmp/uint64(x[i]) != uint64(y[i]) {
+			result.SetNull(i, true)
+			return types.ErrOverflow.GenWithStackByArgs("BIGINT UNSIGNED", fmt.Sprintf("(%s * %s)", b.args[0].String(), b.args[1].String()))
+		}
+		x[i] = int64(tmp)
+	}
+	return nil
 }
