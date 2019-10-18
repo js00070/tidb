@@ -927,119 +927,119 @@ func benchmarkVectorizedBuiltinFunc(b *testing.B, vecExprCases vecExprBenchCases
 					b.Fatal(fmt.Sprintf("evalType=%v is not supported", testCase.retEvalType))
 				}
 			})
-			b.Run(baseFuncName+"-NonVecBuiltinFunc", func(b *testing.B) {
-				b.ResetTimer()
-				it := chunk.NewIterator4Chunk(input)
-				switch testCase.retEvalType {
-				case types.ETInt:
-					for i := 0; i < b.N; i++ {
-						output.Reset()
-						for row := it.Begin(); row != it.End(); row = it.Next() {
-							v, isNull, err := baseFunc.evalInt(row)
-							if err != nil {
-								b.Fatal(err)
-							}
-							if isNull {
-								output.AppendNull()
-							} else {
-								output.AppendInt64(v)
-							}
-						}
-					}
-				case types.ETReal:
-					for i := 0; i < b.N; i++ {
-						output.Reset()
-						for row := it.Begin(); row != it.End(); row = it.Next() {
-							v, isNull, err := baseFunc.evalReal(row)
-							if err != nil {
-								b.Fatal(err)
-							}
-							if isNull {
-								output.AppendNull()
-							} else {
-								output.AppendFloat64(v)
-							}
-						}
-					}
-				case types.ETDecimal:
-					for i := 0; i < b.N; i++ {
-						output.Reset()
-						for row := it.Begin(); row != it.End(); row = it.Next() {
-							v, isNull, err := baseFunc.evalDecimal(row)
-							if err != nil {
-								b.Fatal(err)
-							}
-							if isNull {
-								output.AppendNull()
-							} else {
-								output.AppendMyDecimal(v)
-							}
-						}
-					}
-				case types.ETDatetime, types.ETTimestamp:
-					for i := 0; i < b.N; i++ {
-						output.Reset()
-						for row := it.Begin(); row != it.End(); row = it.Next() {
-							v, isNull, err := baseFunc.evalTime(row)
-							if err != nil {
-								b.Fatal(err)
-							}
-							if isNull {
-								output.AppendNull()
-							} else {
-								output.AppendTime(v)
-							}
-						}
-					}
-				case types.ETDuration:
-					for i := 0; i < b.N; i++ {
-						output.Reset()
-						for row := it.Begin(); row != it.End(); row = it.Next() {
-							v, isNull, err := baseFunc.evalDuration(row)
-							if err != nil {
-								b.Fatal(err)
-							}
-							if isNull {
-								output.AppendNull()
-							} else {
-								output.AppendDuration(v)
-							}
-						}
-					}
-				case types.ETJson:
-					for i := 0; i < b.N; i++ {
-						output.Reset()
-						for row := it.Begin(); row != it.End(); row = it.Next() {
-							v, isNull, err := baseFunc.evalJSON(row)
-							if err != nil {
-								b.Fatal(err)
-							}
-							if isNull {
-								output.AppendNull()
-							} else {
-								output.AppendJSON(v)
-							}
-						}
-					}
-				case types.ETString:
-					for i := 0; i < b.N; i++ {
-						output.Reset()
-						for row := it.Begin(); row != it.End(); row = it.Next() {
-							v, isNull, err := baseFunc.evalString(row)
-							if err != nil {
-								b.Fatal(err)
-							}
-							if isNull {
-								output.AppendNull()
-							} else {
-								output.AppendString(v)
-							}
-						}
-					}
-				default:
-					b.Fatal(fmt.Sprintf("evalType=%v is not supported", testCase.retEvalType))
-				}
-			})
+			// b.Run(baseFuncName+"-NonVecBuiltinFunc", func(b *testing.B) {
+			// 	b.ResetTimer()
+			// 	it := chunk.NewIterator4Chunk(input)
+			// 	switch testCase.retEvalType {
+			// 	case types.ETInt:
+			// 		for i := 0; i < b.N; i++ {
+			// 			output.Reset()
+			// 			for row := it.Begin(); row != it.End(); row = it.Next() {
+			// 				v, isNull, err := baseFunc.evalInt(row)
+			// 				if err != nil {
+			// 					b.Fatal(err)
+			// 				}
+			// 				if isNull {
+			// 					output.AppendNull()
+			// 				} else {
+			// 					output.AppendInt64(v)
+			// 				}
+			// 			}
+			// 		}
+			// 	case types.ETReal:
+			// 		for i := 0; i < b.N; i++ {
+			// 			output.Reset()
+			// 			for row := it.Begin(); row != it.End(); row = it.Next() {
+			// 				v, isNull, err := baseFunc.evalReal(row)
+			// 				if err != nil {
+			// 					b.Fatal(err)
+			// 				}
+			// 				if isNull {
+			// 					output.AppendNull()
+			// 				} else {
+			// 					output.AppendFloat64(v)
+			// 				}
+			// 			}
+			// 		}
+			// 	case types.ETDecimal:
+			// 		for i := 0; i < b.N; i++ {
+			// 			output.Reset()
+			// 			for row := it.Begin(); row != it.End(); row = it.Next() {
+			// 				v, isNull, err := baseFunc.evalDecimal(row)
+			// 				if err != nil {
+			// 					b.Fatal(err)
+			// 				}
+			// 				if isNull {
+			// 					output.AppendNull()
+			// 				} else {
+			// 					output.AppendMyDecimal(v)
+			// 				}
+			// 			}
+			// 		}
+			// 	case types.ETDatetime, types.ETTimestamp:
+			// 		for i := 0; i < b.N; i++ {
+			// 			output.Reset()
+			// 			for row := it.Begin(); row != it.End(); row = it.Next() {
+			// 				v, isNull, err := baseFunc.evalTime(row)
+			// 				if err != nil {
+			// 					b.Fatal(err)
+			// 				}
+			// 				if isNull {
+			// 					output.AppendNull()
+			// 				} else {
+			// 					output.AppendTime(v)
+			// 				}
+			// 			}
+			// 		}
+			// 	case types.ETDuration:
+			// 		for i := 0; i < b.N; i++ {
+			// 			output.Reset()
+			// 			for row := it.Begin(); row != it.End(); row = it.Next() {
+			// 				v, isNull, err := baseFunc.evalDuration(row)
+			// 				if err != nil {
+			// 					b.Fatal(err)
+			// 				}
+			// 				if isNull {
+			// 					output.AppendNull()
+			// 				} else {
+			// 					output.AppendDuration(v)
+			// 				}
+			// 			}
+			// 		}
+			// 	case types.ETJson:
+			// 		for i := 0; i < b.N; i++ {
+			// 			output.Reset()
+			// 			for row := it.Begin(); row != it.End(); row = it.Next() {
+			// 				v, isNull, err := baseFunc.evalJSON(row)
+			// 				if err != nil {
+			// 					b.Fatal(err)
+			// 				}
+			// 				if isNull {
+			// 					output.AppendNull()
+			// 				} else {
+			// 					output.AppendJSON(v)
+			// 				}
+			// 			}
+			// 		}
+			// 	case types.ETString:
+			// 		for i := 0; i < b.N; i++ {
+			// 			output.Reset()
+			// 			for row := it.Begin(); row != it.End(); row = it.Next() {
+			// 				v, isNull, err := baseFunc.evalString(row)
+			// 				if err != nil {
+			// 					b.Fatal(err)
+			// 				}
+			// 				if isNull {
+			// 					output.AppendNull()
+			// 				} else {
+			// 					output.AppendString(v)
+			// 				}
+			// 			}
+			// 		}
+			// 	default:
+			// 		b.Fatal(fmt.Sprintf("evalType=%v is not supported", testCase.retEvalType))
+			// 	}
+			// })
 		}
 	}
 }
