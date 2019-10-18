@@ -1,0 +1,25 @@
+goos: linux
+goarch: amd64
+pkg: github.com/pingcap/tidb/expression
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  303470	      3991 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  255002	      3972 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  281448	      3934 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  266505	      3967 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  283735	      4024 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  280911	      4228 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  275389	      3922 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  277593	      3944 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  271846	      3987 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  264691	      3982 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  273960	      3959 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  270753	      3966 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  264782	      3956 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  268825	      4043 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  272227	      3951 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  284547	      3920 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  285710	      3939 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  279114	      3986 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  302095	      3933 ns/op	       0 B/op	       0 allocs/op
+BenchmarkVectorizedBuiltinArithmeticFunc/builtinArithmeticMinusRealSig-VecBuiltinFunc-4         	  284371	      3939 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/pingcap/tidb/expression	25.051s

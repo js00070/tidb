@@ -89,11 +89,11 @@ func (b *builtinArithmeticMinusRealSig) vecEvalReal(input *chunk.Chunk, result *
 		return err
 	}
 
-	// result.MergeNulls(buf)
+	result.MergeNulls(buf)
 	x := result.Float64s()
 	y := buf.Float64s()
 	for i := 0; i < n; i++ {
-		if result.IsNull(i) || buf.IsNull(i) {
+		if result.IsNull(i) {
 			continue
 		}
 		if (x[i] > 0 && -y[i] > math.MaxFloat64-x[i]) || (x[i] < 0 && -y[i] < -math.MaxFloat64-x[i]) {
