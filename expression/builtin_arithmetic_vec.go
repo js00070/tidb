@@ -182,7 +182,7 @@ func (b *builtinArithmeticMinusDecimalSig) vecEvalDecimal(input *chunk.Chunk, re
 }
 
 func (b *builtinArithmeticMinusIntSig) vectorized() bool {
-	return false
+	return true
 }
 
 func (b *builtinArithmeticMinusIntSig) vecEvalInt(input *chunk.Chunk, result *chunk.Column) error {
