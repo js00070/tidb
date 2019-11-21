@@ -727,11 +727,43 @@ func (b *builtinJSONContainsPathSig) vecEvalInt(input *chunk.Chunk, result *chun
 }
 
 func (b *builtinJSONArrayAppendSig) vectorized() bool {
-	return false
+	return true
 }
 
 func (b *builtinJSONArrayAppendSig) vecEvalJSON(input *chunk.Chunk, result *chunk.Column) error {
-	return errors.Errorf("not implemented")
+	nr := input.NumRows()
+	buf, err := b.bufAllocator.get(types.ETJson, nr)
+	if err != nil {
+		return err
+	}
+	defer b.bufAllocator.put(buf)
+	if err := b.args[0].VecEvalJSON(b.ctx, input, buf); err != nil {
+		return err
+	}
+	pathBufs := make([]*chunk.Column, (len(b.args)-1)/2)
+	valueBufs := make([]*chunk.Column, (len(b.args)-1)/2)
+	for i := 1; i < len(b.args); i++ {
+		if i&1 == 0 {
+			valueBufs[i/2-1], err = b.bufAllocator.get(types.ETJson, nr)
+			if err != nil {
+				return err
+			}
+			defer b.bufAllocator.put(valueBufs[i/2-1])
+			if err:=b.args[i].VecEvalJSON(b.ctx,input,valueBufs); err!=nil{
+				return err
+			}
+		} else {
+			pathBufs[(i-1)/2], err = b.bufAllocator.get(types.ETString, nr)
+			if err != nil {
+				return err
+			}
+			defer b.bufAllocator.put(pathBufs[(i-1)/2])
+		}
+	}
+	for i := 0; i < (len(b.args)-1)/2; i++ {
+
+	}
+	return nil
 }
 
 func (b *builtinJSONUnquoteSig) vectorized() bool {
