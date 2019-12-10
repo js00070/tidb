@@ -190,11 +190,9 @@ func (b *builtinInIntSig) evalInt(row chunk.Row) (int64, bool, error) {
 	}
 	isUnsigned0 := mysql.HasUnsignedFlag(b.args[0].GetType().Flag)
 
-	var args []Expression
+	args := b.args
 	if b.hashSet != nil {
 		args = b.nonConstArgs
-	} else {
-		args = b.args
 	}
 	if b.hashSet != nil {
 		if isUnsigned, ok := b.hashSet[arg0]; ok {
