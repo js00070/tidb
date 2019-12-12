@@ -14,6 +14,7 @@
 package expression
 
 import (
+	"runtime/debug"
 	"strings"
 
 	"github.com/pingcap/errors"
@@ -329,6 +330,7 @@ func (b *builtinInJSONSig) Clone() builtinFunc {
 }
 
 func (b *builtinInJSONSig) evalInt(row chunk.Row) (int64, bool, error) {
+	debug.PrintStack()
 	arg0, isNull0, err := b.args[0].EvalJSON(b.ctx, row)
 	if isNull0 || err != nil {
 		return 0, isNull0, err

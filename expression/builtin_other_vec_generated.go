@@ -16,6 +16,8 @@
 package expression
 
 import (
+	"runtime/debug"
+
 	"github.com/pingcap/parser/mysql"
 	"github.com/pingcap/tidb/types"
 	"github.com/pingcap/tidb/types/json"
@@ -381,6 +383,7 @@ func (b *builtinInDurationSig) vectorized() bool {
 }
 
 func (b *builtinInJSONSig) vecEvalInt(input *chunk.Chunk, result *chunk.Column) error {
+	debug.PrintStack()
 	n := input.NumRows()
 	buf0, err := b.bufAllocator.get(types.ETJson, n)
 	if err != nil {
