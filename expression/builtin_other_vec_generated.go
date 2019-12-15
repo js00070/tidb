@@ -52,6 +52,10 @@ func (b *builtinInIntSig) vecEvalInt(input *chunk.Chunk, result *chunk.Column) e
 	if b.hashSet != nil {
 		args = b.nonConstArgs
 		for i := 0; i < n; i++ {
+			if buf0.IsNull(i) {
+				hasNull[i] = true
+				continue
+			}
 			arg0 := args0[i]
 			if isUnsigned, ok := b.hashSet[arg0]; ok {
 				if (isUnsigned0 && isUnsigned) || (!isUnsigned0 && !isUnsigned) {

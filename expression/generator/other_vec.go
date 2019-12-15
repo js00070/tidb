@@ -142,6 +142,10 @@ func (b *{{.SigName}}) vecEvalInt(input *chunk.Chunk, result *chunk.Column) erro
 	if b.hashSet != nil {
 		args = b.nonConstArgs
 		for i := 0; i < n; i++ {
+			if buf0.IsNull(i) {
+				hasNull[i] = true
+				continue
+			}
 			{{- if $InputInt }}
 				arg0 := args0[i]
 				if isUnsigned, ok := b.hashSet[arg0]; ok {
@@ -153,11 +157,6 @@ func (b *{{.SigName}}) vecEvalInt(input *chunk.Chunk, result *chunk.Column) erro
 					}
 				}
 			{{- else }}
-				if buf0.IsNull(i) {
-					hasNull[i] = true
-					continue
-				}
-
 				{{- if $InputFixed }}
 					arg0 := args0[i]
 				{{- else }}
@@ -253,6 +252,7 @@ import (
 
 	. "github.com/pingcap/check"
 	"github.com/pingcap/parser/ast"
+	"github.com/pingcap/parser/mysql"
 	"github.com/pingcap/tidb/types"
 	"github.com/pingcap/tidb/types/json"
 )
@@ -322,6 +322,47 @@ var vecBuiltin{{ .Category }}GeneratedCases = map[string][]vecExprBenchCase {
 				inGener{defaultGener{eType: types.ET{{.Input.ETName}}, nullRation: 0.2}},
 				inGener{defaultGener{eType: types.ET{{.Input.ETName}}, nullRation: 0.2}},
 				inGener{defaultGener{eType: types.ET{{.Input.ETName}}, nullRation: 0.2}},
+			},
+		}, 
+	{{- end }}
+	{{- range .Sigs }} 
+		// {{ .SigName }} with const arguments
+		{
+			retEvalType: types.ET{{ .Output.ETName }}, 
+			childrenTypes: []types.EvalType{
+				types.ET{{ .Input.ETName }}, 
+				types.ET{{ .Input.ETName }}, types.ET{{ .Input.ETName }},
+			},
+			constants: []*Constant{
+				nil,
+				{{- if eq .Input.ETName "Int" }}
+					{Value: types.NewDatum(1), RetType: types.NewFieldType(mysql.TypeInt24)},
+					{Value: types.NewDatum(2), RetType: types.NewFieldType(mysql.TypeInt24)},
+				{{- end }}
+				{{- if eq .Input.ETName "String" }}
+					{Value: types.NewStringDatum("aaaa"), RetType: types.NewFieldType(mysql.TypeString)},
+					{Value: types.NewStringDatum("bbbb"), RetType: types.NewFieldType(mysql.TypeString)},
+				{{- end }}
+				{{- if eq .Input.ETName "Datetime" }}
+					{Value: types.NewTimeDatum(dateTimeFromString("2019-01-01")), RetType: types.NewFieldType(mysql.TypeDatetime)},
+					{Value: types.NewTimeDatum(dateTimeFromString("2019-01-01")), RetType: types.NewFieldType(mysql.TypeDatetime)},
+				{{- end }}
+				{{- if eq .Input.ETName "Json" }}
+					{Value: types.NewJSONDatum(json.CreateBinary("aaaa")), RetType: types.NewFieldType(mysql.TypeJSON)},
+					{Value: types.NewJSONDatum(json.CreateBinary("bbbb")), RetType: types.NewFieldType(mysql.TypeJSON)},
+				{{- end }}
+				{{- if eq .Input.ETName "Duration" }}
+					{Value: types.NewDurationDatum(types.Duration{Duration: time.Duration(1000)}), RetType: types.NewFieldType(mysql.TypeDuration)},
+					{Value: types.NewDurationDatum(types.Duration{Duration: time.Duration(2000)}), RetType: types.NewFieldType(mysql.TypeDuration)},
+				{{- end }}
+				{{- if eq .Input.ETName "Real" }}
+					{Value: types.NewFloat64Datum(0.1), RetType: types.NewFieldType(mysql.TypeFloat)},
+					{Value: types.NewFloat64Datum(0.2), RetType: types.NewFieldType(mysql.TypeFloat)},
+				{{- end }}
+				{{- if eq .Input.ETName "Decimal" }}
+					{Value: types.NewDecimalDatum(types.NewDecFromInt(10)), RetType: types.NewFieldType(mysql.TypeDecimal)},
+					{Value: types.NewDecimalDatum(types.NewDecFromInt(20)), RetType: types.NewFieldType(mysql.TypeDecimal)},
+				{{- end }}
 			},
 		}, 
 	{{- end }}

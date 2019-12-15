@@ -444,6 +444,12 @@ func (b *builtinInDecimalSig) buildHashMapForConstArgs(ctx sessionctx.Context) e
 func (b *builtinInDecimalSig) Clone() builtinFunc {
 	newSig := &builtinInDecimalSig{}
 	newSig.cloneFrom(&b.baseBuiltinFunc)
+	newSig.nonConstArgs = make([]Expression, 0, len(b.nonConstArgs))
+	for _, arg := range b.nonConstArgs {
+		newSig.nonConstArgs = append(newSig.nonConstArgs, arg.Clone())
+	}
+	newSig.hashSet = b.hashSet
+	newSig.threshold = b.threshold
 	return newSig
 }
 
@@ -452,8 +458,21 @@ func (b *builtinInDecimalSig) evalInt(row chunk.Row) (int64, bool, error) {
 	if isNull0 || err != nil {
 		return 0, isNull0, err
 	}
+
+	args := b.args
+	if b.hashSet != nil {
+		args = b.nonConstArgs
+		key, err := arg0.ToHashKey()
+		if err != nil {
+			return 0, true, err
+		}
+		if _, ok := b.hashSet[string(key)]; ok {
+			return 1, false, nil
+		}
+	}
+
 	var hasNull bool
-	for _, arg := range b.args[1:] {
+	for _, arg := range args[1:] {
 		evaledArg, isNull, err := arg.EvalDecimal(b.ctx, row)
 		if err != nil {
 			return 0, true, err

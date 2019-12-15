@@ -45,29 +45,27 @@ var vecBuiltinOtherCases = map[string][]vecExprBenchCase{
 			retEvalType: types.ETInt,
 			childrenTypes: []types.EvalType{
 				types.ETInt,
-				types.ETInt, types.ETInt, types.ETInt, types.ETInt,
-				types.ETInt,
+				types.ETInt, types.ETInt,
 			},
 			constants: []*Constant{
 				nil,
-				nil, nil, nil, nil,
 				{Value: types.NewDatum(1), RetType: types.NewFieldType(mysql.TypeInt24)},
+				{Value: types.NewDatum(2), RetType: types.NewFieldType(mysql.TypeInt24)},
 			},
-			geners: []dataGenerator{&rangeInt64Gener{1, 2}, nil, nil, nil, nil},
+			geners: []dataGenerator{&rangeInt64Gener{1, 3}},
 		},
 		{
 			retEvalType: types.ETInt,
 			childrenTypes: []types.EvalType{
 				types.ETString,
-				types.ETString, types.ETString, types.ETString, types.ETString,
-				types.ETString,
+				types.ETString, types.ETString,
 			},
 			constants: []*Constant{
 				nil,
-				nil, nil, nil, nil,
-				{Value: types.NewStringDatum("aaaaaaaaaa"), RetType: types.NewFieldType(mysql.TypeString)},
+				{Value: types.NewStringDatum("aaaa"), RetType: types.NewFieldType(mysql.TypeString)},
+				{Value: types.NewStringDatum("bbbb"), RetType: types.NewFieldType(mysql.TypeString)},
 			},
-			geners: []dataGenerator{&constStrGener{"aaaaaaaaaa"}, nil, nil, nil, nil},
+			geners: []dataGenerator{&constStrGener{"aaaa"}},
 		},
 		{
 			retEvalType: types.ETInt,
@@ -85,12 +83,12 @@ var vecBuiltinOtherCases = map[string][]vecExprBenchCase{
 			retEvalType: types.ETInt,
 			childrenTypes: []types.EvalType{
 				types.ETJson,
-				types.ETJson,
+				types.ETJson, types.ETJson,
 			},
 			constants: []*Constant{
 				nil,
-				{Value: types.NewJSONDatum(json.CreateBinary("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")), RetType: types.NewFieldType(mysql.TypeJSON)},
-				{Value: types.NewJSONDatum(json.CreateBinary("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")), RetType: types.NewFieldType(mysql.TypeJSON)},
+				{Value: types.NewJSONDatum(json.CreateBinary("aaaa")), RetType: types.NewFieldType(mysql.TypeJSON)},
+				{Value: types.NewJSONDatum(json.CreateBinary("bbbb")), RetType: types.NewFieldType(mysql.TypeJSON)},
 			},
 		},
 		{
