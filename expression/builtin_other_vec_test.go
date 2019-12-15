@@ -60,15 +60,12 @@ var vecBuiltinOtherCases = map[string][]vecExprBenchCase{
 			childrenTypes: []types.EvalType{
 				types.ETString,
 				types.ETString, types.ETString, types.ETString, types.ETString,
-				types.ETString, //types.ETString, types.ETString, types.ETString,
+				types.ETString,
 			},
 			constants: []*Constant{
 				nil,
 				nil, nil, nil, nil,
 				{Value: types.NewStringDatum("aaaaaaaaaa"), RetType: types.NewFieldType(mysql.TypeString)},
-				//{Value: types.NewDatum("bbbbbbbbbb"), RetType: types.NewFieldType(mysql.TypeString)},
-				//{Value: types.NewDatum("cccccccccc"), RetType: types.NewFieldType(mysql.TypeString)},
-				//{Value: types.NewDatum("dddddddddd"), RetType: types.NewFieldType(mysql.TypeString)},
 			},
 			geners: []dataGenerator{&constStrGener{"aaaaaaaaaa"}, nil, nil, nil, nil},
 		},
@@ -88,12 +85,12 @@ var vecBuiltinOtherCases = map[string][]vecExprBenchCase{
 			retEvalType: types.ETInt,
 			childrenTypes: []types.EvalType{
 				types.ETJson,
-				types.ETJson, //types.ETJson,
+				types.ETJson,
 			},
 			constants: []*Constant{
 				nil,
 				{Value: types.NewJSONDatum(json.CreateBinary("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")), RetType: types.NewFieldType(mysql.TypeJSON)},
-				//{Value: types.NewJSONDatum(json.CreateBinary("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")), RetType: types.NewFieldType(mysql.TypeJSON)},
+				{Value: types.NewJSONDatum(json.CreateBinary("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")), RetType: types.NewFieldType(mysql.TypeJSON)},
 			},
 		},
 		{
@@ -118,6 +115,18 @@ var vecBuiltinOtherCases = map[string][]vecExprBenchCase{
 				nil,
 				{Value: types.NewFloat64Datum(0.1), RetType: types.NewFieldType(mysql.TypeFloat)},
 				{Value: types.NewFloat64Datum(0.2), RetType: types.NewFieldType(mysql.TypeFloat)},
+			},
+		},
+		{
+			retEvalType: types.ETInt,
+			childrenTypes: []types.EvalType{
+				types.ETDecimal,
+				types.ETDecimal, types.ETDecimal,
+			},
+			constants: []*Constant{
+				nil,
+				{Value: types.NewDecimalDatum(types.NewDecFromInt(10)), RetType: types.NewFieldType(mysql.TypeDecimal)},
+				{Value: types.NewDecimalDatum(types.NewDecFromInt(20)), RetType: types.NewFieldType(mysql.TypeDecimal)},
 			},
 		},
 	},

@@ -687,7 +687,7 @@ func (b *builtinInJSONSig) evalInt(row chunk.Row) (int64, bool, error) {
 	args := b.args
 	if b.hashSet != nil {
 		args = b.nonConstArgs
-		json, err := arg0.MarshalJSON()
+		json, err := arg0.ToHashKey()
 		if err != nil {
 			return 0, true, err
 		}
