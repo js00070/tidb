@@ -118,7 +118,9 @@ var builtinInTmpl = template.Must(template.New("builtinInTmpl").Parse(`
 {{ $InputTime := (eq .Input.TypeName "Time") }}
 {{ $InputJson := (eq .Input.TypeName "JSON") }}
 {{ $InputDuration := (eq .Input.TypeName "Duration")}}
+{{ $InputDecimal := (eq .Input.TypeName "Decimal")}}
 {{ $InputFixed := ( .Input.Fixed ) }}
+{{ $UseHashKey := ( or (eq .Input.TypeName "Decimal") (eq .Input.TypeName "JSON") )}}
 func (b *{{.SigName}}) vecEvalInt(input *chunk.Chunk, result *chunk.Column) error {
 	n := input.NumRows()
 	{{- template "BufAllocator" . }}
@@ -137,85 +139,47 @@ func (b *{{.SigName}}) vecEvalInt(input *chunk.Chunk, result *chunk.Column) erro
 	var compareResult int
 	args := b.args
 
-	{{- if $InputInt }}
 	if b.hashSet != nil {
 		args = b.nonConstArgs
 		for i := 0; i < n; i++ {
-			arg0 := args0[i]
-			if isUnsigned, ok := b.hashSet[arg0]; ok {
-				if (isUnsigned0 && isUnsigned) || (!isUnsigned0 && !isUnsigned) {
-					r64s[i] = 1
+			{{- if $InputInt }}
+				arg0 := args0[i]
+				if isUnsigned, ok := b.hashSet[arg0]; ok {
+					if (isUnsigned0 && isUnsigned) || (!isUnsigned0 && !isUnsigned) {
+						r64s[i] = 1
+					}
+					if arg0 >= 0 {
+						r64s[i] = 1
+					}
 				}
-				if arg0 >= 0 {
-					r64s[i] = 1
+			{{- else }}
+				if buf0.IsNull(i) {
+					hasNull[i] = true
+					continue
 				}
-			}
+
+				{{- if $InputFixed }}
+					arg0 := args0[i]
+				{{- else }}
+					arg0 := buf0.Get{{ .Input.TypeName }}(i)
+				{{- end }}
+
+				{{- if $UseHashKey }}
+					key, err := arg0.ToHashKey()
+					if err != nil{
+						return err
+					}
+					if _, ok := b.hashSet[string(key)]; ok {
+						r64s[i] = 1
+					}
+				{{- else }}
+					if _, ok := b.hashSet[arg0]; ok {
+						r64s[i] = 1
+					}
+				{{- end }}
+			{{- end }}
 		}
 	}
-	{{- end }}
-	{{- if $InputString }}
-	if b.hashSet != nil {
-		args = b.nonConstArgs
-		for i := 0; i < n; i++ {
-			if buf0.IsNull(i) {
-				hasNull[i] = true
-				continue
-			}
-			arg0 := buf0.GetString(i)
-			if _, ok := b.hashSet[arg0]; ok {
-				r64s[i] = 1
-			}
-		}
-	}
-	{{- end }}
-	{{- if $InputTime }}
-	if b.hashSet != nil {
-		args = b.nonConstArgs
-		for i := 0; i < n; i++ {
-			if buf0.IsNull(i) {
-				hasNull[i] = true
-				continue
-			}
-			arg0 := buf0.GetTime(i)
-			if _, ok := b.hashSet[arg0]; ok {
-				r64s[i] = 1
-			}
-		}
-	}
-	{{- end }}
-	{{- if or $InputDuration $InputReal }}
-	if b.hashSet != nil {
-		args = b.nonConstArgs
-		for i := 0; i < n; i++ {
-			if buf0.IsNull(i) {
-				hasNull[i] = true
-				continue
-			}
-			if _, ok := b.hashSet[args0[i]]; ok {
-				r64s[i] = 1
-			}
-		}
-	}
-	{{- end }}
-	{{- if $InputJson }}
-	if b.hashSet != nil {
-		args = b.nonConstArgs
-		for i := 0; i < n; i++ {
-			if buf0.IsNull(i) {
-				hasNull[i] = true
-				continue
-			}
-			arg0 := buf0.GetJSON(i)
-			json, err := arg0.MarshalJSON()
-			if err != nil {
-				return err
-			}
-			if _, ok := b.hashSet[string(json)]; ok {
-				r64s[i] = 1
-			}
-		}
-	}
-	{{- end }}
 
 	for j := 1; j < len(args); j++ {
 		if err := args[j].VecEval{{ .Input.TypeName }}(b.ctx, input, buf1); err != nil {

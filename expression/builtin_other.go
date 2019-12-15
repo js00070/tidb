@@ -104,7 +104,12 @@ func (c *inFunctionClass) getFunction(ctx sessionctx.Context, args []Expression)
 		sig = &inReal
 		sig.setPbCode(tipb.ScalarFuncSig_InReal)
 	case types.ETDecimal:
-		sig = &builtinInDecimalSig{baseBuiltinFunc: bf}
+		inDecimal := builtinInDecimalSig{baseBuiltinFunc: bf, threshold: 2}
+		err := inDecimal.buildHashMapForConstArgs(ctx)
+		if err != nil {
+			return &inDecimal, err
+		}
+		sig = &inDecimal
 		sig.setPbCode(tipb.ScalarFuncSig_InDecimal)
 	case types.ETDatetime, types.ETTimestamp:
 		inTime := builtinInTimeSig{baseBuiltinFunc: bf, threshold: 2}
@@ -398,6 +403,42 @@ func (b *builtinInRealSig) evalInt(row chunk.Row) (int64, bool, error) {
 // builtinInDecimalSig see https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#function_in
 type builtinInDecimalSig struct {
 	baseBuiltinFunc
+	nonConstArgs []Expression
+	hashSet      map[string]bool
+	threshold    int
+}
+
+func (b *builtinInDecimalSig) buildHashMapForConstArgs(ctx sessionctx.Context) error {
+	b.nonConstArgs = make([]Expression, 0, len(b.args))
+	b.nonConstArgs = append(b.nonConstArgs, b.args[0])
+	b.hashSet = make(map[string]bool, len(b.args)-1)
+	count := 0
+	for i := 1; i < len(b.args); i++ {
+		if b.args[i].ConstItem() {
+			val, isNull, err := b.args[i].EvalDecimal(ctx, chunk.Row{})
+			if err != nil {
+				return err
+			}
+			if isNull {
+				b.nonConstArgs = append(b.nonConstArgs, b.args[i])
+				continue
+			}
+			key, err := val.ToHashKey()
+			if err != nil {
+				return err
+			}
+			b.hashSet[string(key)] = true
+			count++
+		} else {
+			b.nonConstArgs = append(b.nonConstArgs, b.args[i])
+		}
+	}
+	if count < b.threshold {
+		b.nonConstArgs = b.args
+		b.hashSet = nil
+	}
+
+	return nil
 }
 
 func (b *builtinInDecimalSig) Clone() builtinFunc {
@@ -607,11 +648,11 @@ func (b *builtinInJSONSig) buildHashMapForConstArgs(ctx sessionctx.Context) erro
 				b.nonConstArgs = append(b.nonConstArgs, b.args[i])
 				continue
 			}
-			json, err := val.MarshalJSON()
+			key, err := val.ToHashKey()
 			if err != nil {
 				return err
 			}
-			b.hashSet[string(json)] = true
+			b.hashSet[string(key)] = true
 			count++
 		} else {
 			b.nonConstArgs = append(b.nonConstArgs, b.args[i])
